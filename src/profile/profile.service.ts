@@ -29,12 +29,13 @@ export class ProfileService {
     return token;
   }
 
-  private async generateToken(userId: string) {
+  async generateToken(userId: string) {
     const payLoad = { userId: userId.toString() };
     return { token: this.jwtService.sign(payLoad, { secret: `${process.env.PRIVATE_KEY}`, expiresIn: "10h" }) };
   }
 
   async sendDeleteById(req: Request, id: number) {
+    try {
     const authHeader = req.headers["authorization"];
     const token = authHeader.split(" ")[1];
     const userAuth = this.jwtService.verify<CreateProfileDto>(token);
@@ -45,6 +46,9 @@ export class ProfileService {
     const result = await firstValueFrom(this.client.send("delete-user", id));
     if (result == null) return "This Id is not exist";
     return this.deleteById(id);
+    } catch (e){
+      return ("User hasn't authorities");
+    }
   }
 
   private async deleteById(id: number) {

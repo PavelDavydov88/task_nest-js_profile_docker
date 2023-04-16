@@ -33,7 +33,8 @@ describe('ProfileController', () => {
         SequelizeModule.forFeature([Profile]),
         AuthModule,
         ConfigModule.forRoot({
-          envFilePath: `.${process.env.NODE_ENV}.env`
+          // envFilePath: `.${process.env.NODE_ENV}.env`
+          envFilePath: `.development.env`
         }),
         SequelizeModule.forRoot({
           dialect: "postgres",
@@ -63,7 +64,9 @@ describe('ProfileController', () => {
 
   describe('check error for delete', () => {
     it('should return "User hasn\'t authorities" if Id does not exist', async () => {
-      let req = {headers: {authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzMyIsImlhdCI6MTY4MTYyODQ0OCwiZXhwIjoxNjgxNjY0NDQ4fQ.LQO0i2hMlJxX8sdlFZyW6zYVwy1EhDKQnxmWYel7PXg'}} as unknown as Request;
+      const token = profileService.generateToken('0');
+
+      let req = {headers: {authorization: 'Bearer' + ' '+ `${token}`}} as unknown as Request;
       expect(await profileController.remove( req, -1)).toEqual("User hasn't authorities")
     });
   });
